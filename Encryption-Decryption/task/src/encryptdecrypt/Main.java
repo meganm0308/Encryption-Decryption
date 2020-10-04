@@ -1,9 +1,6 @@
 package encryptdecrypt;
 
-import java.util.Scanner;
-
 public class Main {
-final static Scanner scanner = new Scanner(System.in);
 
 private static String encryption (String text, int key) {
     StringBuilder sb = new StringBuilder();
@@ -29,14 +26,28 @@ private static String decryption (String encryptedText, int key) {
     return sb.toString();
 }
     public static void main(String[] args) {
-        String operation = scanner.nextLine();
-        String text = scanner.nextLine();
-        int key = scanner.nextInt();
+        String mode = "enc";
+        int key = 0;
+        String data = "";
 
-        if (operation.equals("enc")) {
-            System.out.println(encryption(text, key));
-        } else {
-            System.out.println(decryption(text, key));
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].contains("-mode")) {
+                mode = args[i + 1];
+            }
+            if (args[i].contains("-key")) {
+                key = Integer.parseInt(args[i + 1]);
+            }
+            if (args[i].contains("-data")) {
+                data = args[i + 1];
+            }
+        }
+        switch (mode) {
+            case "enc":
+                System.out.println(encryption(data, key));
+                break;
+            case "dec":
+                System.out.println(decryption(data, key));
+                break;
         }
     }
 }
