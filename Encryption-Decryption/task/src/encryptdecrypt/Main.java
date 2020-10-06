@@ -5,29 +5,6 @@ import java.util.Scanner;
 
 public class Main {
 
-private static String encryption (String text, int key) {
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < text.length(); i++) {
-        int shiftByKey = text.charAt(i) + key;
-        int shift = shiftByKey > 127 ?
-                shiftByKey - 128
-                : shiftByKey;
-        sb.append((char) shift);
-    }
-    return sb.toString();
-}
-
-private static String decryption (String encryptedText, int key) {
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < encryptedText.length(); i++) {
-        int shiftByKey = encryptedText.charAt(i) - key;
-        int shift = shiftByKey < 0 ?
-                shiftByKey + 128
-                : shiftByKey;
-        sb.append((char) shift);
-    }
-    return sb.toString();
-}
     public static void main(String[] args) {
         String mode = "enc";
         int key = 0;
@@ -36,6 +13,7 @@ private static String decryption (String encryptedText, int key) {
         boolean dataOut = false;
         String inputFile = null;
         String outputFile = null;
+        String alg = "shift";
 
 
         for (int i = 0; i < args.length; i++) {
@@ -56,6 +34,9 @@ private static String decryption (String encryptedText, int key) {
                 dataOut = true;
                 outputFile = args[i + 1];
             }
+            if (args[i].contains("-alg")) {
+                alg = args[i + 1];
+            }
         }
 
         if (dataIn && data.isEmpty()) {
@@ -73,24 +54,52 @@ private static String decryption (String encryptedText, int key) {
 
         switch (mode) {
             case "enc":
-                if (!dataOut) {
-                    System.out.println(encryption(data, key));
+                if (alg.equals("shift")) {
+                    ChooseMethod choose = new ChooseMethod(new Shifting());
+                    if (!dataOut) {
+                        System.out.println(choose.processData(data, key));
+                    } else {
+                        try(FileWriter fileWriter = new FileWriter(outputFile)){
+                            fileWriter.write(choose.processData(data, key));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 } else {
-                    try(FileWriter fileWriter = new FileWriter(outputFile)){
-                        fileWriter.write(encryption(data, key));
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    ChooseMethod choose = new ChooseMethod(new Unicode());
+                    if (!dataOut) {
+                        System.out.println(choose.processData(data, key));
+                    } else {
+                        try(FileWriter fileWriter = new FileWriter(outputFile)){
+                            fileWriter.write(choose.processData(data, key));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
                 break;
             case "dec":
-                if (!dataOut) {
-                    System.out.println(decryption(data, key));
+                if (alg.equals("shift")) {
+                    ChooseMethod choose = new ChooseMethod(new ShiftingDec());
+                    if (!dataOut) {
+                        System.out.println(choose.processData(data, key));
+                    } else {
+                        try(FileWriter fileWriter = new FileWriter(outputFile)){
+                            fileWriter.write(choose.processData(data, key));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 } else {
-                    try(FileWriter fileWriter = new FileWriter(outputFile)){
-                        fileWriter.write(decryption(data, key));
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    ChooseMethod choose = new ChooseMethod(new UnicodeDec());
+                    if (!dataOut) {
+                        System.out.println(choose.processData(data, key));
+                    } else {
+                        try(FileWriter fileWriter = new FileWriter(outputFile)){
+                            fileWriter.write(choose.processData(data, key));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
                 break;
